@@ -4,7 +4,25 @@ var app = angular.module('app', [
   'btford.socket-io'
 ]);
 
-app.controller('Index', function($scope, $timeout, $http) {
+app.factory('socket', function(socketFactory) {
+  return socketFactory();
+});
+
+app.factory('session', function() {
+  return {
+    getId: function() {
+      return localStorage.getItem('_id');
+    },
+    setId: function(id) {
+      localStorage.setItem('_id', id);
+    },
+    clear: function() {
+      localStorage.clear();
+    }
+  };
+});
+
+app.controller('Index', function($scope, $timeout, $http, socket, session) {
   $scope.players = [];
 
   $scope.map = {
@@ -56,4 +74,31 @@ app.controller('Index', function($scope, $timeout, $http) {
         };
       });
     });
+
+  socket.on('player.pos', function(pos) {
+    if ($scope.players.length === 0) {
+      $scope.players.push({
+        _id: pos._id,
+        icon: '/img/monkey.png',
+        coords: null
+      });
+    }
+
+    var idx = findById($scope.players, session.getId());
+
+    if (idx > -1) {
+      $scope.players[idx].coords = toCoords(pos);
+    }
+
+    if (!session.getId() && pos._id) {
+      session.setId(pos._id);
+    }
+  });
+
+  socket.on('player.gone', function() {
+    session.clear();
+    window.location.reload();
+  });
+
+  socket.emit('player.load', { _id: session.getId() });
 });

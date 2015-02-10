@@ -3,6 +3,7 @@ var app = express();
 var PORT = 8080;
 var db;
 var Mongo = require('mongodb').MongoClient;
+var io = require('socket.io')();
 
 var Player = require('./player');
 
@@ -38,4 +39,25 @@ app.all('*', function(req, res) {
 
 var server = app.listen(PORT, function() {
   console.log('server up on %d', PORT);
+});
+
+io.serveClient(false);
+io.attach(server);
+
+io.on('connection', function(socket) {
+  console.log('websocket client connected (%d)', io.engine.clientsCount);
+
+  socket.on('player.load', function(pos) {
+    Player.getOrCreate(db, pos, function(player) {
+      if (!player) {
+        return socket.emit('player.gone');
+      }
+
+      socket.emit('player.pos', {
+        _id: player._id,
+        lng: player.lng,
+        lat: player.lat
+      });
+    });
+  });
 });
