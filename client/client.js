@@ -24,6 +24,7 @@ app.factory('session', function() {
 
 app.controller('Index', function($scope, $timeout, $http, socket, session) {
   $scope.players = [];
+  $scope.bananas = [];
 
   $scope.map = {
     center: [0, 0],
@@ -102,6 +103,16 @@ app.controller('Index', function($scope, $timeout, $http, socket, session) {
   socket.on('player.gone', function() {
     session.clear();
     window.location.reload();
+  });
+
+  socket.on('banana.list', function(bananas) {
+    $scope.bananas = bananas.map(function(b) {
+      return {
+        _id: b._id,
+        coords: toCoords(b.coords),
+        icon: '/img/banana.png'
+      };
+    });
   });
 
   socket.emit('player.load', { _id: session.getId() });

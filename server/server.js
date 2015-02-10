@@ -7,6 +7,7 @@ var io = require('socket.io')();
 
 var Player = require('./player');
 var Geo = require('./geo');
+var Banana = require('./banana');
 
 Mongo.connect('mongodb://localhost:27017/flying-monkey', function(err, _db) {
   if (err) {
@@ -15,6 +16,8 @@ Mongo.connect('mongodb://localhost:27017/flying-monkey', function(err, _db) {
   }
 
   db = _db;
+
+  Banana.spawn(db);
 });
 
 app.use(express.static(__dirname + '/../client'));
@@ -59,6 +62,10 @@ io.on('connection', function(socket) {
         lng: player.lng,
         lat: player.lat
       });
+    });
+
+    Banana.getAll(db, function(bananas) {
+      socket.emit('banana.list', bananas);
     });
   });
 
