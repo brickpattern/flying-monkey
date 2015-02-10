@@ -115,5 +115,13 @@ app.controller('Index', function($scope, $timeout, $http, socket, session) {
     });
   });
 
+  socket.on('banana.remove', function(banana) {
+    var idx = findById($scope.bananas, banana._id);
+
+    if (idx > -1) {
+      $scope.bananas.splice(idx, 1);
+    }
+  });
+
   socket.emit('player.load', { _id: session.getId() });
 });

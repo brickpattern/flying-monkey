@@ -47,6 +47,24 @@ module.exports.update = function(db, player, newPos, cb) {
   });
 };
 
+module.exports.consumeBanana = function(db, player, banana, cb) {
+  var bananas = db.collection('bananas');
+  var players = db.collection('players');
+
+  bananas.remove({ _id: new ObjectID(banana._id) }, function(err) {
+    if (err) {
+      return console.log('err eat ban', err);
+    }
+
+    players.update({ _id: new ObjectID(player._id) }, { $inc: { points: 1 } }, function(err) {
+      if (err) {
+        return console.log('err upd consume', err);
+      }
+
+      return cb();
+    });
+  });
+};
 
 module.exports.getAll = function(db, cb) {
   var players = db.collection('players');

@@ -97,6 +97,18 @@ io.on('connection', function(socket) {
 
             socket.emit('player.pos', moved);
 
+            Banana.getNearby(db, point, function(bananas) {
+              bananas.forEach(function(banana) {
+                Player.consumeBanana(db, player, banana, function() {
+                  var nom = {
+                    _id: banana._id
+                  };
+
+                  socket.emit('banana.remove', nom);
+                });
+              });
+            });
+
             if (pts.length) {
               moveToPoint(pts.shift());
             }

@@ -34,3 +34,27 @@ module.exports.getAll = function(db, cb) {
     return cb(results);
   });
 };
+
+module.exports.getNearby = function(db, point, cb) {
+  var bananas = db.collection('bananas');
+
+  var edibles = {
+    coords: {
+      $nearSphere: {
+        $geometry: {
+          type : 'Point',
+          coordinates : [point.lng, point.lat]
+        },
+        $maxDistance: 500000
+      }
+    }
+  };
+
+  bananas.find(edibles).toArray(function(err, results) {
+    if (err) {
+      return console.log('nearby error', err);
+    }
+
+    return cb(results);
+  });
+};
