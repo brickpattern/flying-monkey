@@ -25,7 +25,6 @@ app.factory('session', function() {
 app.controller('Index', function($scope, $timeout, $http, socket, session) {
   $scope.players = [];
   $scope.bananas = [];
-
   $scope.map = {
     center: [0, 0],
     zoom: 3,
@@ -69,16 +68,33 @@ app.controller('Index', function($scope, $timeout, $http, socket, session) {
     return -1;
   }
 
-  $http.get('/players')
-    .then(function(response) {
-      $scope.players = (response.data || []).map(function(p) {
-        return {
-          _id: p._id,
-          icon: '/img/monkey.png',
-          coords: toCoords(p)
-        };
-      });
+  function refreshPlayers(players) {
+    $scope.players = players.map(function(p) {
+      return {
+        _id: p._id,
+        icon: p._id == session.getId() ?
+          '/img/monkey.png' : '/img/monkey2.png',
+        coords: toCoords(p)
+      };
     });
+
+    $scope.scores = players.map(function(s) {
+      return {
+        pname: session.getId() == s._id ? 'Me' : 'Bad Monkey',
+        points: s.points || 0
+      };
+    });
+  }
+
+  (function getPlayers() {
+    $timeout(function() {
+      $http.get('/players')
+        .then(function(response) {
+          refreshPlayers(response.data || []);
+          getPlayers();
+        });
+    }, 1000);
+  })();
 
   socket.on('player.pos', function(pos) {
     if ($scope.players.length === 0) {
@@ -97,6 +113,21 @@ app.controller('Index', function($scope, $timeout, $http, socket, session) {
 
     if (!session.getId() && pos._id) {
       session.setId(pos._id);
+    }
+  });
+
+  socket.on('player.other', function(pos) {
+    var idx = findById($scope.players, pos._id);
+
+    if (idx > -1) {
+      $scope.players[idx].coords = toCoords(pos);
+    }
+    else {
+      $scope.players.push({
+        _id: pos._id,
+        icon: '/img/monkey2.png',
+        coords: toCoords(pos)
+      });
     }
   });
 

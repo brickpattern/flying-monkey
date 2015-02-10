@@ -22,5 +22,11 @@
     <ui-gmap-markers idKey="'_id'" coords="'coords'" icon="'icon'" models="players"></ui-gmap-markers>
     <ui-gmap-markers idKey="'_id'" coords="'coords'" icon="'icon'" models="bananas"></ui-gmap-markers>
   </ui-gmap-google-map>
+
+  <div class="topscores">
+    <div ng-repeat="s in scores">
+      <div class="score">{{s.pname}}<br>points: {{s.points}}</div>
+    </div>
+  </div>
 </body>
 </html>
