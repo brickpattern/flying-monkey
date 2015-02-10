@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body ng-app="app" ng-controller="Index">
-  {{msg}}
+  <ui-gmap-google-map center="map.center" zoom="map.zoom" options="map.options" events="map.events">
+  </ui-gmap-google-map>
 </body>
 </html>
