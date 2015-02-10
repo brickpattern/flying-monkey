@@ -6,6 +6,7 @@ var Mongo = require('mongodb').MongoClient;
 var io = require('socket.io')();
 
 var Player = require('./player');
+var Geo = require('./geo');
 
 Mongo.connect('mongodb://localhost:27017/flying-monkey', function(err, _db) {
   if (err) {
@@ -62,20 +63,39 @@ io.on('connection', function(socket) {
   });
 
   socket.on('player.move', function(pos) {
+    var SPEED = 10000000; // m/s
+    var RATE = 50; // ms refresh
+
     Player.getOrCreate(db, pos, function(player) {
       if (!player) {
         return socket.emit('player.gone');
       }
 
-      Player.update(db, player, pos, function() {
-        var moved = {
-          _id: player._id,
-          lng: pos.lng,
-          lat: pos.lat
-        };
+      var dist = Geo.getDistance(player, pos);
+      var time = dist / SPEED;
+      var steps = time / RATE * 1000;
 
-        socket.emit('player.pos', moved);
-      });
+      var pts = Geo.getPoints(player, pos, Math.ceil(steps));
+
+      pts.push(pos);
+
+      (function moveToPoint(point) {
+        setTimeout(function() {
+          Player.update(db, player, point, function() {
+            var moved = {
+              _id: player._id,
+              lng: point.lng,
+              lat: point.lat
+            };
+
+            socket.emit('player.pos', moved);
+
+            if (pts.length) {
+              moveToPoint(pts.shift());
+            }
+          });
+        }, RATE);
+      })(pts.shift());
     });
   });
 });
