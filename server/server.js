@@ -60,4 +60,22 @@ io.on('connection', function(socket) {
       });
     });
   });
+
+  socket.on('player.move', function(pos) {
+    Player.getOrCreate(db, pos, function(player) {
+      if (!player) {
+        return socket.emit('player.gone');
+      }
+
+      Player.update(db, player, pos, function() {
+        var moved = {
+          _id: player._id,
+          lng: pos.lng,
+          lat: pos.lat
+        };
+
+        socket.emit('player.pos', moved);
+      });
+    });
+  });
 });

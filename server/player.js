@@ -27,6 +27,27 @@ module.exports.getOrCreate = function(db, pos, cb) {
   }
 };
 
+module.exports.update = function(db, player, newPos, cb) {
+  var players = db.collection('players');
+
+  var values = {
+    $set: {
+      lng: newPos.lng,
+      lat: newPos.lat
+    }
+  };
+
+  players.update({ _id: player._id }, values, function(err) {
+    if (err) {
+      console.log('update error', err);
+      return;
+    }
+
+    return cb();
+  });
+};
+
+
 module.exports.getAll = function(db, cb) {
   var players = db.collection('players');
 

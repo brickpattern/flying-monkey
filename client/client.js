@@ -42,7 +42,11 @@ app.controller('Index', function($scope, $timeout, $http, socket, session) {
       click: function(map, event, args) {
         var pos = args[0].latLng;
 
-        console.log(pos.lat(), pos.lng());
+        socket.emit('player.move', {
+          _id: session.getId(),
+          lat: pos.lat(),
+          lng: pos.lng()
+        });
       }
     }
   };
