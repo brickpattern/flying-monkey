@@ -1,0 +1,34 @@
+{
+  "name": "flying-monkey",
+  "version": "1.0.0",
+  "authors": [
+    "Alex Soncodi <asoncodi@gmail.com>"
+  ],
+  "description": "Explore the MEAN Stack on a Flying Monkey",
+  "main": "client/client.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "mongodb",
+    "flying",
+    "monkey",
+    "explore",
+    "talk"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.10",
+    "angular-google-maps": "~2.0.12",
+    "socket.io-client": "~1.3.2",
+    "angular-socket-io": "~0.7.0"
+  }
+}
