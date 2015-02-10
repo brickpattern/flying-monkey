@@ -4,7 +4,9 @@ var app = angular.module('app', [
   'btford.socket-io'
 ]);
 
-app.controller('Index', function($scope, $timeout) {
+app.controller('Index', function($scope, $timeout, $http) {
+  $scope.players = [];
+
   $scope.map = {
     center: [0, 0],
     zoom: 3,
@@ -43,4 +45,15 @@ app.controller('Index', function($scope, $timeout) {
 
     return -1;
   }
+
+  $http.get('/players')
+    .then(function(response) {
+      $scope.players = (response.data || []).map(function(p) {
+        return {
+          _id: p._id,
+          icon: '/img/monkey.png',
+          coords: toCoords(p)
+        };
+      });
+    });
 });

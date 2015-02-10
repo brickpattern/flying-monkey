@@ -18,6 +18,8 @@
 </head>
 <body ng-app="app" ng-controller="Index">
   <ui-gmap-google-map center="map.center" zoom="map.zoom" options="map.options" events="map.events">
+
+    <ui-gmap-markers idKey="'_id'" coords="'coords'" icon="'icon'" models="players"></ui-gmap-markers>
   </ui-gmap-google-map>
 </body>
 </html>
